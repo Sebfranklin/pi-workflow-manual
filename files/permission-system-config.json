@@ -1,0 +1,50 @@
+{
+  "permission": {
+    "*": "allow",
+    "path": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.env.example": "allow",
+      ".dev.vars": "deny",
+      "auth.json": "deny",
+      "*/.ssh/*": "deny",
+      "*/.infisical/*": "deny",
+      "*.pem": "deny",
+      "*.key": "deny"
+    },
+    "bash": {
+      "*": "allow",
+      "rm -rf /": "deny",
+      "rm -rf ~": "deny",
+      "rm -rf ~/*": "deny",
+      "rm -rf /data/data/com.termux": "deny",
+      "rm -rf /data/data/com.termux/usr": "deny",
+      "sudo *": "deny",
+      "git push --force*": "deny",
+      "git push * main": "deny",
+      "git push * master": "deny",
+      "git merge *": "deny",
+      "infisical secrets*": "deny",
+      "infisical export*": "deny",
+      "infisical sm secrets*": "deny",
+      "infisical sm export*": "deny",
+      "infisical run*": "deny",
+      "infisical sm run*": "deny",
+      "env": "deny",
+      "printenv*": "deny",
+      "export -p": "deny",
+      "age -d*": "deny",
+      "gpg -d*": "deny",
+      "npm install*": "deny",
+      "npm ci*": "deny",
+      "npm run build*": "deny",
+      "next build*": "deny",
+      "vite build*": "deny",
+      "wrangler dev*": "deny",
+      "supabase start*": "deny",
+      "npx *": "ask"
+    },
+    "external_directory": "allow"
+  }
+}

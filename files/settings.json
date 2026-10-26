@@ -1,0 +1,30 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "lastChangelogVersion": "1.4.0",
+  "theme": "dark",
+  "defaultProjectTrust": "ask",
+  "packages": [
+    "npm:pi-btw",
+    "../../superpowers",
+    "npm:pi-memory",
+    "npm:billion-context",
+    "npm:@dietrichgebert/ponytail",
+    "npm:pi-subagents@latest",
+    "npm:@piotr-oles/pi-bell",
+    "npm:pi-usage",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:@schovest/pi-goal",
+    "npm:@gotgenes/pi-permission-system",
+    "npm:pi-sessions",
+    "npm:pi-web-access@latest"
+  ],
+  "defaultProvider": "dolphin",
+  "defaultModel": "deepseek-ai/DeepSeek-V4.1-Flash",
+  "defaultThinkingLevel": "low",
+  "modelThinkingLevels": {
+    "dolphin/deepseek-ai/DeepSeek-V4.1-Flash": "low",
+    "openrouter/z-ai/glm-5.3": "medium",
+    "openrouter/anthropic/claude-sonnet-5": "medium",
+    "openrouter/openai/gpt-5.6-sol": "high"
+  }
+}

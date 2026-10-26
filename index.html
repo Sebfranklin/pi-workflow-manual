@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pi Workflow — Replication Manual</title>
+<meta name="description" content="Complete inventory and setup guide for a Pi agent workflow: rules, extensions, packages, models, CLI tools, skills.">
+<style>
+  :root{
+    --ink:#111214;
+    --ink-2:#4a4d53;
+    --ink-3:#71757c;
+    --line:#dfe0e2;
+    --paper:#fbfbfa;
+    --paper-2:#f2f2f0;
+    --accent:#c8410e;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:16px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:2px}
+  a:hover{color:var(--accent)}
+  code,kbd{font-family:var(--mono);font-size:.86em;background:var(--paper-2);
+    padding:.12em .35em;border-radius:3px;border:1px solid var(--line)}
+  pre{margin:0;padding:14px 16px;background:var(--ink);color:#e9e9e6;
+    border-radius:4px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55}
+  pre code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+
+  .wrap{max-width:940px;margin:0 auto;padding:0 20px 96px}
+
+  /* ---- masthead ---- */
+  header.top{border-bottom:1px solid var(--ink);padding:56px 0 22px;margin-bottom:0}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-3);margin:0 0 14px}
+  h1{font-size:clamp(30px,7vw,52px);line-height:1.03;letter-spacing:-.03em;
+    font-weight:650;margin:0 0 16px}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lede{font-size:clamp(15px,2.4vw,18px);color:var(--ink-2);max-width:60ch;margin:0}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:26px 0 0;
+    font-family:var(--mono);font-size:11px;color:var(--ink-3);
+    text-transform:uppercase;letter-spacing:.08em}
+
+  /* ---- nav ---- */
+  nav.toc{border-bottom:1px solid var(--line);background:var(--paper-2);
+    position:sticky;top:0;z-index:5;margin:0 0 8px}
+  nav.toc ul{list-style:none;margin:0;padding:0;display:flex;gap:0;
+    overflow-x:auto;scrollbar-width:none}
+  nav.toc ul::-webkit-scrollbar{display:none}
+  nav.toc a{display:block;padding:13px 14px;font-family:var(--mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2);
+    text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
+  nav.toc a:hover,nav.toc a:focus{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* ---- sections ---- */
+  section{padding-top:52px;scroll-margin-top:52px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--ink);
+    padding-bottom:8px;margin-bottom:22px}
+  .sec-num{font-family:var(--mono);font-size:11px;color:var(--accent);
+    letter-spacing:.1em;flex:none}
+  h2{font-size:clamp(20px,3.6vw,27px);line-height:1.15;letter-spacing:-.02em;
+    font-weight:640;margin:0}
+  h3{font-size:15px;letter-spacing:-.01em;font-weight:650;margin:30px 0 10px}
+  h4{font-family:var(--mono);font-size:11px;text-transform:uppercase;
+    letter-spacing:.1em;color:var(--ink-3);margin:24px 0 8px;font-weight:500}
+  p{margin:0 0 14px;max-width:68ch;color:var(--ink-2)}
+  p strong{color:var(--ink);font-weight:620}
+  ul.plain,ol.plain{margin:0 0 16px;padding-left:20px;color:var(--ink-2);max-width:68ch}
+  ul.plain li,ol.plain li{margin-bottom:7px}
+
+  /* ---- tables ---- */
+  .tw{overflow-x:auto;margin:0 0 20px;border:1px solid var(--line);border-radius:4px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:420px}
+  th{background:var(--paper-2);text-align:left;font-family:var(--mono);
+    font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--ink-3);font-weight:500;padding:9px 12px;border-bottom:1px solid var(--line);
+    white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+  tr:last-child td{border-bottom:0}
+  td:first-child{color:var(--ink);font-weight:520}
+  td code{font-size:12px;white-space:nowrap}
+
+  /* ---- callouts ---- */
+  .note{border-left:3px solid var(--accent);background:var(--paper-2);
+    padding:13px 16px;margin:0 0 20px;border-radius:0 4px 4px 0;font-size:14px;color:var(--ink-2)}
+  .note b{color:var(--ink)}
+  .grid{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);
+    border-radius:4px;overflow:hidden;margin:0 0 22px}
+  @media(min-width:640px){.grid.two{grid-template-columns:1fr 1fr}}
+  .card{background:var(--paper);padding:15px 16px}
+  .card h5{margin:0 0 5px;font-size:13.5px;font-weight:640;color:var(--ink)}
+  .card p{margin:0;font-size:13px;color:var(--ink-3);max-width:none}
+
+  /* ---- steps ---- */
+  ol.steps{list-style:none;counter-reset:s;margin:0 0 20px;padding:0}
+  ol.steps>li{counter-increment:s;position:relative;padding:0 0 20px 40px;
+    border-left:1px solid var(--line);margin-left:13px}
+  ol.steps>li:last-child{border-left-color:transparent;padding-bottom:0}
+  ol.steps>li::before{content:counter(s);position:absolute;left:-13px;top:0;
+    width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);
+    font-family:var(--mono);font-size:12px;display:grid;place-items:center}
+  ol.steps>li h5{margin:2px 0 6px;font-size:14.5px;font-weight:640;color:var(--ink)}
+  ol.steps>li p{margin:0 0 8px;font-size:13.5px}
+  ol.steps pre{margin-top:8px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+  .chip{font-family:var(--mono);font-size:11px;padding:3px 8px;border:1px solid var(--line);
+    border-radius:100px;color:var(--ink-2);background:var(--paper-2)}
+
+  footer{border-top:1px solid var(--ink);margin-top:64px;padding-top:20px;
+    font-size:12px;color:var(--ink-3);font-family:var(--mono)}
+  @media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Replication manual · Pi agent workflow</p>
+  <h1>Copy this workflow<br>to a <em>laptop</em>.</h1>
+  <p class="lede">Everything that makes the setup on this phone work: the rules file, the extensions, the packages, the model catalog, the CLI tools and the skills. Every value below was read off the live machine, not remembered.</p>
+  <div class="meta">
+    <span>pi 1.4.0</span><span>node 24.18</span><span>129 models</span>
+    <span>18 providers</span><span>12 packages</span><span>26 skills</span>
+  </div>
+</header>
+</div>
+
+<nav class="toc">
+  <div class="wrap" style="padding:0">
+    <ul>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#layout">Layout</a></li>
+      <li><a href="#rules">Rules file</a></li>
+      <li><a href="#packages">Packages</a></li>
+      <li><a href="#models">Models</a></li>
+      <li><a href="#extensions">Extensions</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#cli">CLI tools</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#port">Port notes</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- 1 -->
+<section id="stack">
+  <div class="sec-head"><span class="sec-num">01</span><h2>What the stack is</h2></div>
+  <p>Pi is a terminal coding agent. It is one CLI binary plus three kinds of plug-in: <strong>packages</strong> (installed with <code>pi install</code>), <strong>extensions</strong> (TypeScript files that hook into the agent loop), and <strong>skills</strong> (folders of instructions the model loads on demand). A single rules file, <code>AGENTS.md</code>, governs behaviour.</p>
+  <div class="grid two">
+    <div class="card"><h5>Agent core</h5><p>pi 1.4.0 on Node 24. Bundled coding system prompt, tool loop, session store.</p></div>
+    <div class="card"><h5>Policy layer</h5><p>AGENTS.md (361 lines) plus decision-gates.ts. Gates decide closed questions in code, with zero model calls.</p></div>
+    <div class="card"><h5>Capability layer</h5><p>12 packages: memory, subagents, context compression, web search, todos, permission system.</p></div>
+    <div class="card"><h5>Model layer</h5><p>18 OpenAI/Anthropic-compatible gateways, 129 models, keyed by environment variables.</p></div>
+  </div>
+  <div class="note"><b>The one thing that must not break:</b> the gate denylist, the secrets rule, and the no-local-install rule. They are the difference between this working on a phone and it working anywhere. On a laptop the no-install rule can be relaxed — the gates do not have to be.</div>
+</section>
+
+<!-- 2 -->
+<section id="layout">
+  <div class="sec-head"><span class="sec-num">02</span><h2>Directory layout</h2></div>
+  <p>Three roots. Copy them in this shape and pi finds everything automatically.</p>
+<pre><code>~/.pi/agent/                    ← config root (chmod 700)
+├── AGENTS.md                   ← the rules file, 361 lines
+├── settings.json               ← packages, theme, default model
+├── models.json                 ← 18 providers, 129 models
+├── mcp.json                    ← MCP servers (supabase, context7)
+├── auth.json                   ← OAuth/stored keys  ← NEVER copy
+├── mcp-auth.json               ← MCP OAuth tokens   ← NEVER copy
+├── extensions/
+│   ├── decision-gates.ts       ← G1/G4/G6/G8/G9/G12
+│   ├── notify.ts               ← Android notifications
+│   ├── timing.ts               ← ttft / tok-s readout
+│   ├── kiosapi-guard.ts        ← rate pacing for kiosapi
+│   └── pi-permission-system/
+│       └── config.json         ← allow/deny rules
+├── prompts/
+│   ├── chat.md                 ← /chat  tight-answer style
+│   └── check-once.md           ← verify-once discipline
+└── memory/                     ← MEMORY.md, SCRATCHPAD.md, daily/
+    npm/node_modules/           ← installed packages live here
+
+~/superpowers/skills/           ← 15 process skills (git repo)
+~/.agents/skills/               ← 11 standalone skills</code></pre>
+  <p>Also useful, but not required: <code>~/.npmrc</code> with <code>prefix=~/.npm-global</code> so global installs stay in your home directory instead of needing root.</p>
+</section>
+
+<!-- 3 -->
+<section id="rules">
+  <div class="sec-head"><span class="sec-num">03</span><h2>The rules file</h2></div>
+  <p><code>~/.pi/agent/AGENTS.md</code> loads into every session on the machine. A project-level <code>AGENTS.md</code> overrides it. It is 361 lines and organised in ten numbered parts. The parts that matter most when porting:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Part</th><th>What it enforces</th><th>Keep on laptop?</th></tr></thead>
+    <tbody>
+      <tr><td>§0 Installs</td><td>Never install anything without asking in that conversation. Permission is per-install.</td><td>Yes, verbatim</td></tr>
+      <tr><td>§0B Secrets</td><td>Never decrypt, read, list or print a secret. Vault reads are user-run only.</td><td>Yes, verbatim</td></tr>
+      <tr><td>§0C Style</td><td>Answer first, short sentences, plain words, no filler vocabulary.</td><td>Yes, verbatim</td></tr>
+      <tr><td>§1 Protocols</td><td>Intent routing, CRISP-LO pre-flight, superpowers workflow.</td><td>Yes</td></tr>
+      <tr><td>§3B No builds</td><td>No local <code>npm install</code>, no bundlers. Build in CI instead.</td><td>Relax — laptop can build</td></tr>
+      <tr><td>§4E Gates</td><td>Which decision gates exist and which are enforcing.</td><td>Yes</td></tr>
+      <tr><td>§5 UI gate</td><td>Pick a visual direction before writing styling code.</td><td>Yes</td></tr>
+      <tr><td>§6 Browser</td><td>Six breakpoints, mobile first, 44px tap targets.</td><td>Yes</td></tr>
+      <tr><td>§9 Done</td><td>Nine required checks before claiming completion.</td><td>Yes</td></tr>
+      <tr><td>§10 Anti-pass</td><td>No "LGTM" without command output and a lint pass.</td><td>Yes, verbatim</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Local wisdom you should not carry over:</b> §3 lists tools that do not exist on this phone (rtk, cloudflared, the Supabase CLI). On a laptop those tools do exist. Rewrite that table rather than copying it — otherwise the agent will refuse to use things that work.</div>
+</section>
+
+<!-- 4 -->
+<section id="packages">
+  <div class="sec-head"><span class="sec-num">04</span><h2>Installed packages</h2></div>
+  <p>Twelve packages, declared in <code>settings.json</code> and materialised in <code>~/.pi/agent/npm/node_modules/</code>. Install them with the exact names below.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Package</th><th>Version</th><th>What it gives you</th></tr></thead>
+    <tbody>
+      <tr><td><code>pi-memory</code></td><td>0.4.2</td><td>Long-term memory: <code>MEMORY.md</code>, daily logs, scratchpad, keyword/semantic/deep search.</td></tr>
+      <tr><td><code>billion-context</code></td><td>0.1.206</td><td>Context compression. Folds consumed conversation into summaries you can decompress.</td></tr>
+      <tr><td><code>pi-subagents</code></td><td>0.82.0</td><td>Isolated child agents: reviewer, researcher, worker, scout, oracle. Also <code>acp_delegate</code>.</td></tr>
+      <tr><td><code>@dietrichgebert/ponytail</code></td><td>5.3.2</td><td>Minimal-code discipline plus six audit sub-skills (review, audit, debt, gain).</td></tr>
+      <tr><td><code>@gotgenes/pi-permission-system</code></td><td>41.0.0</td><td>Path and bash allow/deny rules, separate from the gates.</td></tr>
+      <tr><td><code>@juicesharp/rpiv-todo</code></td><td>2.15.0</td><td>The task list tool. Four states, dependencies, one item in progress.</td></tr>
+      <tr><td><code>pi-web-access</code></td><td>0.44.0</td><td>Web search and page fetch: <code>web_search</code>, <code>fetch_content</code>, <code>source_check</code>.</td></tr>
+      <tr><td><code>pi-sessions</code></td><td>0.20.2</td><td>Search and interrogate past sessions (<code>session_search</code>, <code>session_ask</code>).</td></tr>
+      <tr><td><code>@schovest/pi-goal</code></td><td>0.2.1</td><td>Goal tracking across turns.</td></tr>
+      <tr><td><code>@piotr-oles/pi-bell</code></td><td>1.0.0</td><td>Terminal bell on turn end.</td></tr>
+      <tr><td><code>pi-usage</code></td><td>0.3.0</td><td>Token and cost accounting per session.</td></tr>
+      <tr><td><code>pi-btw</code></td><td>0.8.0</td><td>Side conversations (<code>/btw</code>) that do not disturb the main thread.</td></tr>
+    </tbody>
+  </table></div>
+  <h4>Install command for all of them</h4>
+<pre><code>pi install npm:pi-btw
+pi install npm:pi-memory
+pi install npm:billion-context
+pi install npm:@dietrichgebert/ponytail
+pi install npm:pi-subagents@latest
+pi install npm:@piotr-oles/pi-bell
+pi install npm:pi-usage
+pi install npm:@juicesharp/rpiv-todo
+pi install npm:@schovest/pi-goal
+pi install npm:@gotgenes/pi-permission-system
+pi install npm:pi-sessions
+pi install npm:pi-web-access@latest</code></pre>
+  <p>Superpowers is installed from a git clone rather than npm, because it is a skills repo, not a package: <code>git clone https://github.com/obra/superpowers ~/superpowers</code> then <code>pi install ~/superpowers</code>.</p>
+</section>
+
+<!-- 5 -->
+<section id="models">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Models and providers</h2></div>
+  <p>Every provider is an OpenAI-compatible or Anthropic-compatible HTTP endpoint declared in <code>models.json</code>. Two are special: <code>aerolink</code> speaks the Anthropic Messages format, and <code>agentrouter-responses</code> speaks the OpenAI Responses format instead of chat completions.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Provider</th><th>API shape</th><th>Base URL</th><th>Models</th></tr></thead>
+    <tbody>
+      <tr><td><code>openrouter</code></td><td>openai-completions</td><td>openrouter.ai/api/v1</td><td>7</td></tr>
+      <tr><td><code>fireworks</code></td><td>openai-completions</td><td>api.fireworks.ai/inference/v1</td><td>15</td></tr>
+      <tr><td><code>nvidia</code></td><td>openai-completions</td><td>integrate.api.nvidia.com/v1</td><td>8</td></tr>
+      <tr><td><code>dolphin</code></td><td>openai-completions</td><td>lighthouse.dphn.ai/run/text-v/v1</td><td>2</td></tr>
+      <tr><td><code>xkiro</code></td><td>openai-completions</td><td>api.xkiro.com/v1</td><td>24</td></tr>
+      <tr><td><code>apinex</code></td><td>openai-completions</td><td>api.apinex.bond/v1</td><td>21</td></tr>
+      <tr><td><code>kiosapi</code></td><td>openai-completions</td><td>kiosapi.com/v1</td><td>22</td></tr>
+      <tr><td><code>river</code></td><td>openai-completions</td><td>api.river.ai/v1</td><td>4</td></tr>
+      <tr><td><code>tokenrouter</code></td><td>openai-completions</td><td>api.tokenrouter.com/v1</td><td>4</td></tr>
+      <tr><td><code>inception</code></td><td>openai-completions</td><td>api.inceptionlabs.ai/v1</td><td>3</td></tr>
+      <tr><td><code>mercury</code></td><td>openai-completions</td><td>api.inceptionlabs.ai/v1</td><td>1</td></tr>
+      <tr><td><code>bai</code></td><td>openai-completions</td><td>api.b.ai/v1</td><td>3</td></tr>
+      <tr><td><code>orcarouter</code></td><td>openai-completions</td><td>api.orcarouter.ai/v1</td><td>2</td></tr>
+      <tr><td><code>gmicloud</code></td><td>openai-completions</td><td>api.gmi-serving.com/v1</td><td>1</td></tr>
+      <tr><td><code>iteracompute</code></td><td>openai-completions</td><td>api.iteracompute.com/v1</td><td>2</td></tr>
+      <tr><td><code>aerolink</code></td><td>anthropic-messages</td><td>capi.aerolink.lat</td><td>6</td></tr>
+      <tr><td><code>agentrouter-responses</code></td><td>openai-responses</td><td>agentrouter.org/v1</td><td>3</td></tr>
+      <tr><td><code>anyrouter</code></td><td>openai-completions</td><td>anyrouter.dev/api/v1</td><td>1</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Defaults in settings.json</h4>
+<pre><code>"defaultProvider": "dolphin",
+"defaultModel": "deepseek-ai/DeepSeek-V4.1-Flash",
+"defaultThinkingLevel": "low",
+"modelThinkingLevels": {
+  "dolphin/deepseek-ai/DeepSeek-V4.1-Flash": "low",
+  "openrouter/z-ai/glm-5.3": "medium",
+  "openrouter/anthropic/claude-sonnet-5": "medium",
+  "openrouter/openai/gpt-5.6-sol": "high"
+}</code></pre>
+
+  <h4>Keys are not in the file</h4>
+  <p>The published <code>models.sanitized.json</code> has every <code>apiKey</code> replaced with an environment placeholder such as <code>$DOLPHIN_API_KEY</code> or <code>$OPENROUTER_API_KEY</code>. Pi resolves <code>$NAME</code> and <code>${NAME}</code> at request time, so you only need to export the variables in your shell profile.</p>
+  <div class="note"><b>Do not copy <code>auth.json</code> or <code>mcp-auth.json</code>.</b> Those hold live credentials in this machine's format. On the laptop, run <code>pi auth login</code> or export the env vars fresh. Copying a credential file across machines is how keys leak.</div>
+  <p>Thinking levels map per provider, because gateways name them differently: <code>off → none</code>, <code>minimal/low → low</code>, <code>high → high</code>, <code>xhigh/max → max</code>. Check each provider's <code>thinkingLevelMap</code> before switching models, or the agent may silently run at the wrong effort.</p>
+</section>
+
+<!-- 6 -->
+<section id="extensions">
+  <div class="sec-head"><span class="sec-num">06</span><h2>Extensions</h2></div>
+  <p>Four TypeScript files plus one permission config, all under <code>~/.pi/agent/extensions/</code>. They need no build step: pi loads them directly.</p>
+
+  <h3>decision-gates.ts — 15.5 KB</h3>
+  <p>The most important file. It runs inline on tool events with zero model calls and zero network calls.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Gate</th><th>When</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td>G1 safety</td><td>every <code>bash</code> call</td><td>Denylist: force-push, push to main, <code>git merge</code>, <code>--hard</code> reset, recursive delete of home/Termux root, <code>mkfs</code>, <code>dd</code>, env dumps, <code>.env</code> reads, vault decryption, inline curl credentials, Supabase CLI.</td></tr>
+      <tr><td>G4 review</td><td>turn end + on demand</td><td>Tracks written paths, appends one advisory line: forced / normal / inline review, plus security-scan and browser-review flags.</td></tr>
+      <tr><td>G6 loop cap</td><td>on tool failure</td><td>Counts identical failures. Third one injects "stop retrying, change approach". Hard cap in code.</td></tr>
+      <tr><td>G8 tier</td><td>on demand</td><td>Classifies a task as trivial / standard / hard.</td></tr>
+      <tr><td>G9 scope</td><td>on demand</td><td>Flags node_modules, lockfiles, dist, build output in a changed-file list.</td></tr>
+      <tr><td>G12 success cap</td><td>on success</td><td>Second identical green command injects "already verified — report and stop".</td></tr>
+    </tbody>
+  </table></div>
+  <p>Two bugs fixed in this copy are worth preserving: the forced-path regex is <code>/(^|\/)(delete|destroy|drop)([^a-z0-9]|$)/i</code> so <code>dropdown.tsx</code> is not mistaken for a deletion path, and the Termux-root rule is anchored rather than prefix-matching.</p>
+
+  <h3>notify.ts — Android only</h3>
+  <p>Raises a real Android notification plus a vibration when a turn finishes, so backgrounded Termux still tells you. Every call is wrapped in <code>timeout -k 1 4</code> with a 5-second minimum gap, because a frozen Termux:API app otherwise blocks forever. <strong>Delete this file on a laptop</strong> — it calls <code>termux-notification</code>, which does not exist there.</p>
+
+  <h3>timing.ts — 6.5 KB</h3>
+  <p>Measures time-to-first-token, total time, and output tokens per second for every response. Shows a one-line marker under each reply and a table at <code>/timing</code>. Pure local arithmetic.</p>
+
+  <h3>kiosapi-guard.ts — rate pacing</h3>
+  <p>Enforces 650 ms between requests to the <code>kiosapi</code> provider to avoid HTTP 429 on the free tier, and warns on 429/5xx. Only activates when the active model provider is <code>kiosapi</code>.</p>
+
+  <h3>pi-permission-system/config.json</h3>
+  <p>Second, independent policy layer. Default allow, then explicit denies.</p>
+<pre><code>path:  *.env, *.env.*, .dev.vars, auth.json, */.ssh/*,
+       */.infisical/*, *.pem, *.key          → deny
+bash:  rm -rf / | ~ | ~/* | /data/data/com.termux
+       sudo *, git push --force*, git push * main
+       git merge *, infisical secrets|export|run
+       env, printenv*, export -p, age -d*, gpg -d*
+       npm install|ci|run build, next build, vite build
+       wrangler dev, supabase start           → deny
+       npx *                                  → ask</code></pre>
+  <div class="note"><b>Known over-reach:</b> the <code>rm -rf /*</code> style rules also match relative paths, so <code>cd dir &amp;&amp; rm -rf sub</code> can be denied. Keep it in mind rather than fighting it.</div>
+</section>
+
+<!-- 7 -->
+<section id="skills">
+  <div class="sec-head"><span class="sec-num">07</span><h2>Skills</h2></div>
+  <p>Skills are folders with a <code>SKILL.md</code>. They load only when relevant, so they cost nothing until used. Two locations: process skills from superpowers, task skills from <code>~/.agents/skills</code>.</p>
+
+  <h3>Process skills — ~/superpowers/skills (15)</h3>
+  <div class="chips">
+    <span class="chip">using-superpowers</span><span class="chip">brainstorming</span><span class="chip">writing-plans</span>
+    <span class="chip">executing-plans</span><span class="chip">test-driven-development</span><span class="chip">systematic-debugging</span>
+    <span class="chip">requesting-code-review</span><span class="chip">receiving-code-review</span><span class="chip">verification-before-completion</span>
+    <span class="chip">subagent-driven-development</span><span class="chip">dispatching-parallel-agents</span><span class="chip">using-git-worktrees</span>
+    <span class="chip">finishing-a-development-branch</span><span class="chip">writing-skills</span><span class="chip">diagnosing-superpowers</span>
+  </div>
+  <p>The workflow they encode: brainstorm the intent once, write a plan, test first, implement surgically, get an isolated critic, verify with real output, then decide how to land the branch. Version 7.0.0.</p>
+
+  <h3>Task skills — ~/.agents/skills (11)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Skill</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>here-now</code></td><td>Publish files or a site to a live URL in one command.</td></tr>
+      <tr><td><code>infisical-secrets</code></td><td>Move a vault secret into an app without the agent ever seeing it.</td></tr>
+      <tr><td><code>agentrouter</code></td><td>Wire a gateway provider and fix 401/503/402/400 errors.</td></tr>
+      <tr><td><code>frontend-design</code></td><td>Pick a deliberate visual direction before writing CSS.</td></tr>
+      <tr><td><code>motion-director</code></td><td>Programmatic video: Remotion, GSAP, storyboards, beat timing, self-critique.</td></tr>
+      <tr><td><code>ffmpeg</code></td><td>Convert, resize, compress, extract audio.</td></tr>
+      <tr><td><code>image-manipulation-image-magick</code></td><td>Resize, convert, batch process, read metadata.</td></tr>
+      <tr><td><code>pdf-to-markdown</code></td><td>Convert PDFs to clean Markdown offline, using bookmark outlines as headings.</td></tr>
+      <tr><td><code>church-photo-workflow</code></td><td>Offline photo enhancement and watermarking pipeline.</td></tr>
+      <tr><td><code>strip-ai-metadata</code></td><td>Remove C2PA/IPTC/EXIF provenance tags before upload.</td></tr>
+      <tr><td><code>find-skills</code></td><td>Discover and install more skills from skills.sh.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Install extra ones with <code>npx skills add &lt;owner/repo@skill&gt; -g -y</code>. They land in <code>~/.agents/skills/</code> automatically.</p>
+</section>
+
+<!-- 8 -->
+<section id="cli">
+  <div class="sec-head"><span class="sec-num">08</span><h2>CLI tools</h2></div>
+  <p>Versions read from the live machine. The "laptop" column says what to change.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Tool</th><th>Version</th><th>Role</th><th>Laptop</th></tr></thead>
+    <tbody>
+      <tr><td><code>pi</code></td><td>1.4.0</td><td>The agent itself</td><td>same</td></tr>
+      <tr><td><code>node</code></td><td>24.18.0</td><td>Runtime</td><td>20+ is enough</td></tr>
+      <tr><td><code>npm</code></td><td>11.19.0</td><td>Package installs</td><td>same</td></tr>
+      <tr><td><code>python3</code></td><td>3.14.6</td><td>Scripts, local conversion</td><td>same</td></tr>
+      <tr><td><code>git</code></td><td>2.55.0</td><td>Version control</td><td>same</td></tr>
+      <tr><td><code>gh</code></td><td>2.97.0</td><td>GitHub from the shell</td><td>same</td></tr>
+      <tr><td><code>jq</code></td><td>1.8.2</td><td>JSON surgery on configs</td><td>same</td></tr>
+      <tr><td><code>ripgrep</code></td><td>—</td><td>Search (<code>rg</code>)</td><td>same</td></tr>
+      <tr><td><code>oxlint</code></td><td>1.88.0</td><td>The lint gate. Single binary, no install tree.</td><td>same</td></tr>
+      <tr><td><code>fallow</code></td><td>3.33.1</td><td>Static analysis: audit, health, dead code, dupes</td><td>same</td></tr>
+      <tr><td><code>gitleaks</code></td><td>—</td><td>Credential scan on staged changes</td><td>same, add pre-commit hook</td></tr>
+      <tr><td><code>wrangler</code></td><td>4.151.1</td><td>Cloudflare Pages/Workers, non-interactive with <code>CI=true</code></td><td>same; <code>cloudflared</code> installable here</td></tr>
+      <tr><td><code>infisical</code></td><td>0.44.2</td><td>Secret vault, guarded wrapper blocking agent reads</td><td>keep the guard wrapper</td></tr>
+      <tr><td><code>ffmpeg</code></td><td>8.1.2</td><td>Media</td><td>same</td></tr>
+      <tr><td><code>imagemagick</code></td><td>—</td><td>Image ops</td><td>same</td></tr>
+      <tr><td><code>tesseract</code></td><td>—</td><td>OCR</td><td>same</td></tr>
+      <tr><td><code>chromium</code></td><td>155.0.8059.79</td><td>Headless screenshots, six-breakpoint review</td><td>same; Playwright also works here</td></tr>
+      <tr><td><code>tmux</code>, <code>fzf</code>, <code>zoxide</code>, <code>lazygit</code></td><td>—</td><td>Shell comfort</td><td>same</td></tr>
+      <tr><td><code>clang</code>, <code>rust</code>, <code>make</code>, <code>cmake</code></td><td>—</td><td>Native builds</td><td>same</td></tr>
+    </tbody>
+  </table></div>
+  <h4>Tools deliberately absent here</h4>
+  <p><code>rtk</code> (glibc-only, no aarch64 build), <code>cloudflared</code>, the <code>supabase</code> CLI, <code>qmd</code>. On a laptop all four install normally — Supabase work would move from the MCP server to the real CLI plus a local Docker stack, which is a genuine upgrade.</p>
+  <h4>What is on PATH and from where</h4>
+<pre><code>~/.npm-global/bin    pi, oxlint, fallow, wrangler, infisical, clixad
+~/.local/bin         pi-secrets, ripwire, sylph
+$PREFIX/bin          everything apt/pkg-installed (git, jq, ffmpeg, chromium…)
+~/.npmrc             prefix=~/.npm-global   ← keeps globals in home, no root</code></pre>
+</section>
+
+<!-- 9 -->
+<section id="install">
+  <div class="sec-head"><span class="sec-num">09</span><h2>Rebuild it on the laptop</h2></div>
+  <p>Download the bundle from the file list at the bottom of this page, then:</p>
+  <ol class="steps">
+    <li>
+      <h5>Unpack and read the installer</h5>
+      <p>The script is 8 idempotent steps. Read it before running — it does not touch anything outside <code>~/.pi</code>, <code>~/.agents</code> and <code>~/superpowers</code>.</p>
+<pre><code>unzip pi-workflow-bundle.zip -d pi-workflow
+less pi-workflow/install.sh</code></pre>
+    </li>
+    <li>
+      <h5>Run it</h5>
+<pre><code>bash pi-workflow/install.sh</code></pre>
+      <p>Existing files are never overwritten. An existing <code>models.json</code> is backed up first.</p>
+    </li>
+    <li>
+      <h5>Give it keys</h5>
+      <p>Either export the provider variables, or let pi hold them.</p>
+<pre><code># option A — environment
+echo 'export DOLPHIN_API_KEY=...' >> ~/.zshrc
+echo 'export OPENROUTER_API_KEY=...' >> ~/.zshrc
+
+# option B — stored credential
+pi auth login openrouter</code></pre>
+    </li>
+    <li>
+      <h5>Trim the phone-only parts</h5>
+<pre><code>rm ~/.pi/agent/extensions/notify.ts     # calls termux-notification
+# in AGENTS.md: rewrite §3B and the §3 tool table for a machine that can build</code></pre>
+    </li>
+    <li>
+      <h5>Verify once</h5>
+<pre><code>pi --version                       # 1.x
+pi list | head -20                 # packages present
+pi auth status                     # providers ready
+# then inside pi:
+/model                             # picker shows your models</code></pre>
+      <p>One pass is enough. Do not re-run the same check with a different command to be sure.</p>
+    </li>
+    <li>
+      <h5>Add the git guard</h5>
+      <p>Install a pre-commit hook so credentials never reach a commit:</p>
+<pre><code>mkdir -p ~/.git-templates/hooks
+printf '#!/bin/sh\ngitleaks protect --staged --redact\n' \
+  &gt; ~/.git-templates/hooks/pre-commit
+chmod +x ~/.git-templates/hooks/pre-commit
+git config --global init.templateDir ~/.git-templates</code></pre>
+    </li>
+  </ol>
+</section>
+
+<!-- 10 -->
+<section id="port">
+  <div class="sec-head"><span class="sec-num">10</span><h2>Port notes and traps</h2></div>
+  <h3>Do not copy these files</h3>
+  <div class="tw"><table>
+    <thead><tr><th>File</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>auth.json</code></td><td>Live provider credentials.</td></tr>
+      <tr><td><code>mcp-auth.json</code></td><td>OAuth tokens for Supabase/Context7.</td></tr>
+      <tr><td><code>models-store.json</code> (505 KB)</td><td>Cache of the pi.dev model catalog. Regenerates itself.</td></tr>
+      <tr><td><code>sessions/</code>, <code>pi-sessions/</code>, <code>missions/</code></td><td>Conversation history. Large, personal, machine-specific.</td></tr>
+      <tr><td><code>memory/</code></td><td>Personal notes. Copy deliberately if you want them, not as part of setup.</td></tr>
+      <tr><td><code>~/.herenow/credentials</code></td><td>Present only if you signed in; treat as a secret.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Traps that cost time</h3>
+  <ul class="plain">
+    <li><strong>MCP servers need a fresh login.</strong> <code>mcp.json</code> is just two URLs. Run <code>pi mcp login supabase</code> on the laptop; the OAuth flow opens a browser.</li>
+    <li><strong>Extension API version mismatch.</strong> If a package upgrades past the extensions' expectations, <code>decision-gates.ts</code> fails to load. Check <code>pi</code> startup output for extension errors before blaming the gates.</li>
+    <li><strong>Superpowers path is absolute in settings.</strong> This machine has <code>"../../superpowers"</code> relative to <code>~/.pi/agent</code>. On a new machine, prefer <code>pi install ~/superpowers</code> so the path is rewritten correctly.</li>
+    <li><strong>Thinking levels differ per gateway.</strong> A model set to <code>high</code> may run at <code>low</code> if the provider's <code>thinkingLevelMap</code> does not define it. Verify with <code>/thinking</code>.</li>
+    <li><strong><code>kiosapi</code> pacing is hardcoded</strong> at 650 ms. If you switch to a paid tier, raise or remove it in <code>kiosapi-guard.ts</code>.</li>
+    <li><strong>Two policy layers overlap.</strong> The gates and the permission system both deny things. A command blocked by one is not necessarily blocked by the other, and the error text tells you which fired.</li>
+  </ul>
+
+  <h3>What gets better on a laptop</h3>
+  <div class="grid two">
+    <div class="card"><h5>Local builds</h5><p>§3B disappears. <code>npm install</code>, test suites, and bundlers all run locally, so the red-green loop is seconds instead of a CI round trip.</p></div>
+    <div class="card"><h5>Real browser automation</h5><p>Playwright replaces the chromium script. Six-breakpoint review becomes scripted rather than hand-driven.</p></div>
+    <div class="card"><h5>Supabase CLI</h5><p>A local Postgres stack replaces MCP branches for migration testing.</p></div>
+    <div class="card"><h5>Cloud tunnels</h5><p><code>cloudflared</code> installs normally, so exposing a local port is one command.</p></div>
+  </div>
+</section>
+
+<!-- files -->
+<section id="files">
+  <div class="sec-head"><span class="sec-num">11</span><h2>Files in this bundle</h2></div>
+  <p>Every file is linked below. Credentials are stripped; keys appear as <code>$ENV_VAR</code> placeholders.</p>
+  <div class="tw"><table>
+    <thead><tr><th>File</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td><a href="files/install.sh">install.sh</a></td><td>Eight-step idempotent installer</td></tr>
+      <tr><td><a href="files/AGENTS.md">AGENTS.md</a></td><td>The full 361-line rules file</td></tr>
+      <tr><td><a href="files/settings.json">settings.json</a></td><td>Package list, theme, default model, thinking levels</td></tr>
+      <tr><td><a href="files/models.sanitized.json">models.sanitized.json</a></td><td>18 providers, 129 models, keys replaced by <code>$ENV</code></td></tr>
+      <tr><td><a href="files/mcp.json">mcp.json</a></td><td>Supabase and Context7 server URLs</td></tr>
+      <tr><td><a href="files/permission-system-config.json">permission-system-config.json</a></td><td>Allow/deny rules</td></tr>
+      <tr><td><a href="files/extensions/decision-gates.ts">extensions/decision-gates.ts</a></td><td>Six deterministic gates</td></tr>
+      <tr><td><a href="files/extensions/timing.ts">extensions/timing.ts</a></td><td>TTFT and tok/s readout</td></tr>
+      <tr><td><a href="files/extensions/kiosapi-guard.ts">extensions/kiosapi-guard.ts</a></td><td>Rate pacing</td></tr>
+      <tr><td><a href="files/extensions/notify.ts">extensions/notify.ts</a></td><td>Android notifications — delete on laptop</td></tr>
+      <tr><td><a href="files/prompts/chat.md">prompts/chat.md</a></td><td>/chat tight-answer style</td></tr>
+      <tr><td><a href="files/prompts/check-once.md">prompts/check-once.md</a></td><td>Verify-once discipline</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  Generated from the live machine · pi 1.4.0 · node 24.18.0 · 26 Oct 2026<br>
+  No credentials included. Keys appear as $ENV placeholders.
+</footer>
+</div>
+</body>
+</html>
